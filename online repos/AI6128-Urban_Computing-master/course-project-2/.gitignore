@@ -1,0 +1,15 @@
+.ipynb_checkpoints/
+__pycache__/
+
+data/train.csv.zip
+data/porto/
+data/porto_city/
+data/*.graphml
+
+cache/
+report/
+results/*
+.ignore/
+
+
+*.log
