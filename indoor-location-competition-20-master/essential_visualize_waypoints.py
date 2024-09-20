@@ -2,7 +2,7 @@ import os, json, random
 import seaborn as sns, matplotlib.pyplot as plt, numpy as np
 from preprocessing import extract_waypoints
 
-def visualize_waypoints(site, floor, save_dir=None, save_dpi=160, wp_augment=False):
+def visualize_waypoints(site, floor, save_dir=None, save_dpi=200, wp_augment=False):
     plt.clf()
     random.seed(30)
     floor_path = os.path.join("./data", site, floor)
@@ -23,6 +23,8 @@ def visualize_waypoints(site, floor, save_dir=None, save_dpi=160, wp_augment=Fal
         plt.plot(x * map_scaler, img.shape[0] - y * map_scaler, 'o-', markersize=2, linewidth=0.8)
 
     plt.title(f"{site}, {floor}, {sum(len(wps) for wps in waypoints)} Waypoints {'Augmented' if wp_augment else ''}")
+    plt.xlabel('X coordinates (scaled) in meters')
+    plt.ylabel('Y coordinates (scaled) in meters')
     plt.tight_layout()
     plt.savefig(os.path.join(save_dir, f"{site}, {floor}{', augmented' if wp_augment else ''}"), dpi=save_dpi) if save_dir else plt.show()
     return sum(len(wps) for wps in waypoints)
