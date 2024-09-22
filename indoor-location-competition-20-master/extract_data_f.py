@@ -1,8 +1,10 @@
 from os.path import join as path_join
+from os.path import split as path_split
 from glob import iglob
 from json import load as json_load
-from PIL.Image import open as open_image
 from io_f import read_data_file
+from PIL.Image import open as open_image
+        
 
 def extract_data(data_dir, site, floor):
     floor_info_path = path_join(data_dir, site, floor, 'floor_info.json')
@@ -25,3 +27,4 @@ def extract_data(data_dir, site, floor):
         traces.append(data)
   
     return traces, floor_image, height, width, floor_geo
+
