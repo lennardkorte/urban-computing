@@ -64,6 +64,8 @@ def visuaize_wifi_scatter(x,y,mag,floor_image,height,width,site,floor,bssid):
     fig, ax = plt.subplots()
     ax.imshow(floor_image, extent=[0,width,0,height])
     ax.set_title(f"{site}, {floor}, Wifi Heat map for {bssid}")
+    ax.set_xlabel('X coordinates (meters)')
+    ax.set_ylabel('Y coordinates (meters)')
     
     im = ax.scatter(x, y, c=mag, s=10, cmap=cmap)
     cbar = fig.colorbar(im, orientation='vertical', shrink=0.8)

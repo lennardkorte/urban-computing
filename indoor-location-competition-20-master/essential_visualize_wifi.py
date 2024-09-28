@@ -20,7 +20,7 @@ if __name__ == '__main__':
 
     if not os.path.exists(OUT_DIR): os.makedirs(OUT_DIR)
 
-    file_template = '%s_%s_%s_wifi.png'
+    file_template = '%s_%s_wifi.png'
     
     print('essential task: visualize wifi heat map')
     for i, (site_name, floor_name) in enumerate(data_floors(DATA_DIR)):
@@ -44,8 +44,7 @@ if __name__ == '__main__':
         viz_rssi = np.array(wifi_data[viz_bssid])
         # fig = visualize_magnetic_heatmap(viz_rssi[:, 0], viz_rssi[:,1], viz_rssi[:,2], floor_image, height, width, site_name, floor_name, paths, viz_bssid, 'wifi')
         fig = visuaize_wifi_scatter(viz_rssi[:, 0], viz_rssi[:,1], viz_rssi[:,2], floor_image, height, width, site_name, floor_name, viz_bssid)
-        output_filename = file_template % (site_name, floor_name, viz_bssid)
-        output_filename = output_filename.replace(':', '-')
+        output_filename = file_template % (site_name, floor_name)
         output_path = os.path.join(OUT_DIR, output_filename)
 
         print('%s %s (saving as %s)'%(site_name, floor_name, output_filename))
