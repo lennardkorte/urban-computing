@@ -92,9 +92,9 @@ def process_magnetic_data(data, dst=[]):
 
     return dst
 
-def process_wifi_data(data):
+def process_wifi_data(data, augment=True):
     out = []
-    step_positions = compute_step_positions(data.acce, data.ahrs, data.waypoint)
+    step_positions = extract_waypoints(data, xy_only=False, augment=augment)
     all_wifi_data = [dict() for _ in range(len(step_positions))]
     n = data.wifi.shape[0]
 
