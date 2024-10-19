@@ -91,3 +91,30 @@ def process_magnetic_data(data, dst=[]):
         dst.append([mag_t, mag_x, mag_y, mag_z, mag_mag, step_t, step_x, step_y])
 
     return dst
+
+def process_wifi_data(data, group_var='bssid', augment=True):
+    out = []
+    step_positions = extract_waypoints(data, xy_only=False, augment=augment)
+    all_wifi_data = [dict() for _ in range(len(step_positions))]
+    n = data.wifi.shape[0]
+
+    for i in range(n):
+        wifi_t, ssid, bssid, rssi = data.wifi[i, 0:4]
+        match_index = np.argmin(np.abs(int(wifi_t) - step_positions[:, 0]))
+        value = bssid if group_var == 'bssid' else ssid
+            
+        # BSSID exists in the current dictionary
+        if all_wifi_data[match_index].get(value, False):
+            all_wifi_data[match_index][value].append(int(rssi))
+        else:
+            all_wifi_data[match_index][value] = [int(rssi)]
+
+    # Calculate average if there are multiple BSSID in each position
+    for wifi_data, step_position in zip(all_wifi_data, step_positions):
+        agg_data = {}
+        for value, rssi in wifi_data.items():
+            agg_data[value] = np.average(rssi)
+        
+        out.append([step_position.tolist(), agg_data])
+    
+    return out
