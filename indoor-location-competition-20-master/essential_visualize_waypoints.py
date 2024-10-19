@@ -1,43 +1,40 @@
 import os, json, random
-import seaborn as sns, matplotlib.pyplot as plt, numpy as np
+import matplotlib.pyplot as plt, numpy as np
 from preprocessing import extract_waypoints
+from extract_data_f import extract_data
+from util_f import data_floors
 
-def visualize_waypoints(site, floor, save_dir=None, save_dpi=200, wp_augment=False):
-    plt.clf()
-    random.seed(30)
-    floor_path = os.path.join("./data", site, floor)
+def visualize_waypoints(waypoints, img, height, width, site, floor, wp_augment=False):
+    fig, ax = plt.subplots()
 
-    waypoints = [extract_waypoints(os.path.join(floor_path, "path_data_files", f), augment=wp_augment) 
-                 for f in os.listdir(os.path.join(floor_path, "path_data_files"))]
+    ax.imshow(img, extent=[0,width,0,height])
 
-    with open(os.path.join(floor_path, "floor_info.json")) as file:
-        map_info = json.load(file)['map_info']
-
-    img = plt.imread(os.path.join(floor_path, "floor_image.png"))
-    sns.set(style='white')
-    plt.imshow(img)
-    map_scaler = (img.shape[0] / map_info['height'] + img.shape[1] / map_info['width']) / 2
-
+    wp_count = sum(len(wps) for wps in waypoints)
     for wps in waypoints:
         x, y = np.array(wps).T
-        plt.plot(x * map_scaler, img.shape[0] - y * map_scaler, 'o-', markersize=2, linewidth=0.8)
+        ax.plot(x , y, 'o-', markersize=2, linewidth=0.8)
 
-    plt.title(f"{site}, {floor}, {sum(len(wps) for wps in waypoints)} Waypoints {'Augmented' if wp_augment else ''}")
-    plt.xlabel('X coordinates (scaled) in meters')
-    plt.ylabel('Y coordinates (scaled) in meters')
-    plt.tight_layout()
-    plt.savefig(os.path.join(save_dir, f"{site}, {floor}{', augmented' if wp_augment else ''}"), dpi=save_dpi) if save_dir else plt.show()
-    return sum(len(wps) for wps in waypoints)
+    filename = '%s, %s%s' % (site,floor,', augmented' if wp_augment else '')
+    ax.set_title('%s, %s, %d Waypoints %s' % (site,floor,wp_count,'Augmented' if wp_augment else ''))
+    ax.set_xlabel('X coordinates (meters)')
+    ax.set_ylabel('Y coordinates (meters)')
+
+    return fig, filename, wp_count
 
 if __name__ == '__main__':
-    save_dir = os.path.join("./output", os.path.splitext(os.path.basename(__file__))[0])
+    data_dir = os.path.join('.', 'data')
+    save_dir = os.path.join('.', 'output', os.path.splitext(os.path.basename(__file__))[0])
+    save_dpi = 200
+
     if not os.path.exists(save_dir): os.makedirs(save_dir)  # Embedded create_dir logic
-    
-    for augmented in [False, True]:
-        all_waypoints = { 
-            (site.name, f.name): visualize_waypoints(site.name, f.name, save_dir, 200, augmented)
-            for site in os.scandir("./data") if site.is_dir() 
-            for f in os.scandir(site.path) if f.is_dir()  # Embedded get_site_floors logic
-        }
-    
+
+    all_waypoints = {}
+    for site, floor in data_floors(data_dir):
+        traces, img, height, width, geo = extract_data(data_dir, site, floor)
+        for augmented in [True, False]:
+            waypoints = [extract_waypoints(data, augment=augmented) for data in traces]
+            fig, fname, count = visualize_waypoints(waypoints, img, height, width, site, floor, wp_augment=augmented)
+            fig.savefig(os.path.join(save_dir, fname), dpi=save_dpi, bbox_inches='tight')
+            all_waypoints[(augmented, site, floor)] = count
+
     print('COMPLETED:', all_waypoints)
