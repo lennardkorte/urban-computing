@@ -23,19 +23,11 @@ def visualize_labels(ax, title, site, floor, height, width):
     ax.set_xlim([0,width])
     ax.set_ylim([0,height])
 
-def visualize_magnetic_heatmap(x,y,mag,floor_image,height,width,site,floor,paths,bssid=None,viz='magnetic'):
-    if viz == 'magnetic':
-        assert bssid == None, "bssid should be empty if visualizing magnetic"
-        title = 'Geomagnetic Heat Map'
-        clabel = '\xB5T: micro-Tesla'
-        hex_gridsize = int(width)//2
-    elif viz == 'wifi':
-        assert bssid != None, "bssid should not be empty"
-        title = f'Wifi Heat Map for {bssid}' 
-        clabel = 'dBm: decibels'
-        hex_gridsize = int(width)//5
-    
+def visualize_magnetic_heatmap(x,y,mag,floor_image,height,width,site,floor,paths):
     cmap = 'rainbow'
+    title = 'Geomagnetic Heat Map'
+    clabel = '\xB5T: micro-Tesla'
+    hex_gridsize = int(width)//2
     width_ratios = [.95, .05]
 
     fig, axs = plt.subplots(1,2,width_ratios=width_ratios)
@@ -45,13 +37,13 @@ def visualize_magnetic_heatmap(x,y,mag,floor_image,height,width,site,floor,paths
     visualize_labels(ax, title, site, floor, height, width)
     
     # plot background image
-    ax.imshow(floor_image, extent=(0,width,0,height))
+    # ax.imshow(floor_image, extent=(0,width,0,height))
 
     # plot hexbins
     h = ax.hexbin(x=x,y=y,C=mag,gridsize=hex_gridsize,cmap=cmap)
     
     # plot geometry
-    # visualize_geometry(ax, paths)
+    visualize_geometry(ax, paths)
     
     # plot colorbar, and label
     vs = h.get_array().data
