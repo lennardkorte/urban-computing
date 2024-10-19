@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from extract_data_f import extract_data
-from visualize_2_f import visualize_magnetic_heatmap, visuaize_wifi_scatter
+from visualize_2_f import visuaize_wifi_scatter
 from preprocessing import scale_floor_geometry, process_wifi_data
 from collections import defaultdict
 from util_f import data_floors
@@ -42,7 +42,6 @@ if __name__ == '__main__':
         viz_bssid = list(wifi_data.keys())[0] if args.bssid is None else args.bssid 
         print('%s %s %s(generating heatmap)'%(site_name, floor_name, viz_bssid))
         viz_rssi = np.array(wifi_data[viz_bssid])
-        # fig = visualize_magnetic_heatmap(viz_rssi[:, 0], viz_rssi[:,1], viz_rssi[:,2], floor_image, height, width, site_name, floor_name, paths, viz_bssid, 'wifi')
         fig = visuaize_wifi_scatter(viz_rssi[:, 0], viz_rssi[:,1], viz_rssi[:,2], floor_image, height, width, site_name, floor_name, viz_bssid)
         output_filename = file_template % (site_name, floor_name)
         output_path = os.path.join(OUT_DIR, output_filename)
